@@ -17,3 +17,6 @@ venv/
 # IDEs
 .vscode/
 .idea/
+
+# --- do not version large/raw data ---
+data/raw/
