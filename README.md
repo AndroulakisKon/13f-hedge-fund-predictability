@@ -1,6 +1,6 @@
 Hedge Fund Excess Performance Prediction Using Portfolio and Macro Features
 
-Overview
+--> Overview
 
 This project evaluates whether next-quarter excess returns of hedge funds can be predicted using portfolio characteristics extracted from 13F filings and macroeconomic variables.
 
@@ -14,7 +14,8 @@ Four models are compared: OLS, Ridge, Lasso, Random Forest.
 
 The goal is purely predictive: evaluate out-of-sample performance using R² and RMSE.
 
-📁 Project Structure
+--> Project Structure
+
 hedgefund_project/
 ├── README.md
 ├── project_report.pdf
@@ -75,7 +76,7 @@ Execute all models:
 python main.py
 
 
-This script:
+--> This script:
 
 Loads both modeling datasets
 
@@ -102,3 +103,6 @@ Lasso shrinks most variables to zero: Indicates weak linear predictive signals.
 Random Forest underperforms: Nonlinear models struggle with high noise and limited sample size.
 
 Overall, while some features exhibit mild structure, public 13F filings and standard macro variables offer limited forward-looking predictive power for hedge fund excess returns.
+
+Note: Raw data is intentionally excluded. The project runs using the processed
+datasets provided in `data/processed/`.
