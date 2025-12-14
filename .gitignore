@@ -20,3 +20,6 @@ venv/
 
 # --- do not version large/raw data ---
 data/raw/
+
+# Large processed file (do not upload)
+data/processed/13f_clean_holdings.csv
