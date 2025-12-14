@@ -2,16 +2,7 @@ import os
 import pandas as pd
 from src.whales_provider import WhalesDataProvider  # ⬅️ new import
 
-# 1️⃣ Load your API keys
-# Preferred: set these in your shell (~/.zshrc) and do NOT hard-code them here.
-# Example in terminal:
-#   export WHALES_WISDOM_SHARED_KEY="your_shared_key"
-#   export WHALES_WISDOM_SECRET_KEY="your_secret_key"
-#
-# If they are already set in your environment, you don't need the lines below.
 
-# os.environ["WHALES_WISDOM_SHARED_KEY"] = "YOUR_SHARED_KEY_HERE"
-# os.environ["WHALES_WISDOM_SECRET_KEY"] = "YOUR_SECRET_KEY_HERE"
 
 # 2️⃣ Initialize provider
 provider = WhalesDataProvider()

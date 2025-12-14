@@ -19,7 +19,6 @@ from src.yfinance_provider import YFinanceProvider
 
 OUT_FILE = "data/raw/macro_sp500_quarterly.csv"
 
-# Adjust if needed
 START_YEAR = 2000
 END_YEAR   = 2025
 
