@@ -1,0 +1,11 @@
+name: hedgefund_project
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - statsmodels
+  - matplotlib
+  - jupyter

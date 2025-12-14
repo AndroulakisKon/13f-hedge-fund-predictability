@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Data (optional – see note below)
+data/raw/
+
+# OS
+.DS_Store
+
+# Environments
+.env
+.venv
