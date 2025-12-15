@@ -1,9 +1,6 @@
 # main.py
 from pathlib import Path
-import numpy as np
 import pandas as pd
-
-from sklearn.model_selection import TimeSeriesSplit
 
 from src.data_loader import load_dataset, build_X_y
 from src.models import (
@@ -12,29 +9,28 @@ from src.models import (
     train_lasso,
     train_random_forest,
 )
-from src.evaluation import evaluate_model
+from src.evaluation import expanding_window_cv_by_quarter
 
 
-def expanding_window_cv(dataset_name: str, n_splits: int = 5):
+def run_expanding_window(dataset_name: str, n_folds: int = 5):
     print(f"\n=== Expanding-window time-series CV: {dataset_name} ===")
 
     # ------------------------------------------------------------------
-    # 1) Load dataset and ensure correct time ordering
+    # 1) Load data and enforce chronological ordering
     # ------------------------------------------------------------------
     df = load_dataset(dataset_name)
 
     if "quarter_id" not in df.columns:
-        raise ValueError("quarter_id column not found. Cannot enforce time ordering.")
+        raise ValueError("quarter_id column not found in dataset.")
 
     df = df.sort_values("quarter_id").reset_index(drop=True)
 
+    # Build X and y from the SAME dataframe
     X, y = build_X_y(df)
 
     # ------------------------------------------------------------------
-    # 2) Define expanding-window cross-validation
+    # 2) Define models
     # ------------------------------------------------------------------
-    tscv = TimeSeriesSplit(n_splits=n_splits)
-
     model_trainers = {
         "OLS": train_ols,
         "Ridge": train_ridge,
@@ -42,35 +38,24 @@ def expanding_window_cv(dataset_name: str, n_splits: int = 5):
         "RandomForest": train_random_forest,
     }
 
-    results = {name: [] for name in model_trainers}
-
     # ------------------------------------------------------------------
-    # 3) Walk-forward evaluation
-    # ------------------------------------------------------------------
-    for fold, (train_idx, test_idx) in enumerate(tscv.split(X), start=1):
-        print(f"\n--- Fold {fold} ---")
-
-        X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
-        y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
-
-        for name, trainer in model_trainers.items():
-            model = trainer(X_train, y_train)
-            r2, rmse = evaluate_model(model, X_test, y_test)
-
-            results[name].append((r2, rmse))
-            print(f"{name}: R2={r2:.4f}, RMSE={rmse:.4f}")
-
-    # ------------------------------------------------------------------
-    # 4) Aggregate fold results
+    # 3) Quarter-based expanding-window evaluation
     # ------------------------------------------------------------------
     summary = {}
-    for name, scores in results.items():
-        r2s = [s[0] for s in scores]
-        rmses = [s[1] for s in scores]
+
+    for name, trainer in model_trainers.items():
+        cv_out = expanding_window_cv_by_quarter(
+            X=X,
+            y=y,
+            quarter_id=df["quarter_id"],  # quarter blocks
+            model_trainer=trainer,
+            n_folds=n_folds,
+            min_train_fraction=0.5,
+        )
 
         summary[name] = {
-            "mean_R2": np.mean(r2s),
-            "mean_RMSE": np.mean(rmses),
+            "mean_R2": cv_out["mean_r2"],
+            "mean_RMSE": cv_out["mean_rmse"],
         }
 
     return pd.DataFrame(summary).T
@@ -82,8 +67,8 @@ def main():
     print("Expanding-Window Time-Series Cross-Validation")
     print("=" * 70)
 
-    baseline = expanding_window_cv("model_dataset.csv", n_splits=5)
-    transformed = expanding_window_cv("model_dataset_transformed.csv", n_splits=5)
+    baseline = run_expanding_window("model_dataset.csv", n_folds=5)
+    transformed = run_expanding_window("model_dataset_transformed.csv", n_folds=5)
 
     final_results = (
         baseline.add_prefix("baseline_")
