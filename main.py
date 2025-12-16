@@ -2,6 +2,9 @@
 from pathlib import Path
 import pandas as pd
 
+BASE_DIR = Path(__file__).resolve().parent
+
+
 from src.data_loader import load_dataset, build_X_y
 from src.models import (
     train_ols,
@@ -75,8 +78,8 @@ def main():
         .join(transformed.add_prefix("transformed_"))
     )
 
-    results_dir = Path("results")
-    results_dir.mkdir(exist_ok=True)
+    results_dir = BASE_DIR / "results"
+    results_dir.mkdir(parents=True, exist_ok=True)
     output_path = results_dir / "model_comparison_expanding_window.csv"
     final_results.to_csv(output_path)
 
